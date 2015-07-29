@@ -5,6 +5,7 @@ var sass = require('node-sass');
 var path = require('path');
 var os = require('os');
 var fs = require('fs');
+var importOnce = require('node-sass-import-once');
 
 // A typical sass error looks like this
 var SassError = {
@@ -27,7 +28,7 @@ module.exports = function (content) {
     var isSync = typeof callback !== 'function';
     var self = this;
     var resourcePath = this.resourcePath;
-    var extensionMatcher = /\.(sass|scss|css)$/;
+    var extensionMatcher = /\.(sass|scss|css|js|json|yml|yaml)$/;
     var result;
     var fileExt;
     var opt;
@@ -142,7 +143,14 @@ module.exports = function (content) {
     fileExt = '.' + (opt.indentedSyntax? 'sass' : 'scss');
 
     // opt.importer
-    opt.importer = getWebpackImporter();
+    // opt.importer = getWebpackImporter();
+    // ADDED replaces built-in importer method
+    opt.importer = importOnce;
+    opt.importOnce = {
+      index: true,
+      css:   false,
+      bower: false
+    }
 
     // start the actual rendering
     if (isSync) {
